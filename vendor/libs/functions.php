@@ -1,10 +1,10 @@
 <?php
 
 /**
- * Распечатывает содрежимое массива
- * @param array $arr массив
+ * Форматированный вывод
+ * @param mixed $var
  */
-function debug($arr)
+function debug($var)
 {
-    echo '<pre>' . print_r($arr, true) . '</pre>';
+    echo '<pre>' . print_r($var, true) . '</pre>';
 }

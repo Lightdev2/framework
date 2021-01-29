@@ -1,5 +1,7 @@
 <?php
 
+namespace app\controllers;
+
 class PostsNew
 {
 
@@ -8,8 +10,8 @@ class PostsNew
         echo 'index action';
     }
 
-    public function testPageAction()
+    public function testAction()
     {
-        echo 'testPage action';
+        echo 'PostsNew::test';
     }
 }

@@ -1,12 +1,22 @@
 <?php
 
+namespace vendor\core;
+
 /**
  * Класс роутера
  */
 class Router
 {
-
+    /**
+     * Таблица маршрутов
+     * @var array
+     */
     protected static array $routes = [];
+
+    /**
+     * Текущий маршрут 
+     * @var array
+     */
     protected static array $route = [];
 
     /**
@@ -24,7 +34,7 @@ class Router
      * Возвращает таблицу маршрутов
      * @return array таблица маршрутов
      */
-    public static function getRoutes() : array
+    public static function getRoutes(): array
     {
         return self::$routes;
     }
@@ -33,7 +43,7 @@ class Router
      * Возвращает текущий маршрут
      * @return array текущий маршрут
      */
-    public static function getRoute() : array
+    public static function getRoute(): array
     {
         return self::$route;
     }
@@ -44,59 +54,55 @@ class Router
      * @param string $url входящий url
      * @return bool
      */
-    public static function matchRoute(string $url) : bool
+    public static function matchRoute($url): bool
     {
-        foreach(self::$routes as $pattern => $route)
-        {
-            if(preg_match("#$pattern#i", $url, $matches))
-            {
-                foreach($matches as $key => $value)
-                {
-                    if(is_string($key))
-                    {
+        foreach (self::$routes as $pattern => $route) {
+            if (preg_match("#$pattern#i", $url, $matches)) {
+                foreach ($matches as $key => $value) {
+                    if (is_string($key)) {
                         $route[$key] = $value;
                     }
                 }
 
-                if(! isset($route['action']))
-                {
+                if (!isset($route['action'])) {
                     $route['action'] = 'index';
                 }
-
+                $route['controller'] = self::upperCamelCase($route['controller']);
                 self::$route = $route;
                 return true;
             }
         }
-        
+
         return false;
     }
-    
+
     /**
      * Передает управление в контроллер
      * @param string $url входящий url
      * @return void
      */
-    public static function dispatch(string $url) : void
+    public static function dispatch(string $url): void
     {
-        if(self::matchRoute($url))
-        {
-            $controller = self::upperCamelCase(self::$route['controller']);
+        $url = self::removeQueryString($url);
+        echo $url;
+        if (self::matchRoute($url)) {
+            $controller = 'app\controllers\\' .  self::$route['controller'];
 
-            if(class_exists($controller))
-            {
-                $cObj = new $controller;
-                $action = self::lowerCamelCase(self::$route['action'] . 'Action');
+            if (class_exists($controller)) {
+                $cObj = new $controller(self::$route);
                 
-                if(method_exists($cObj, $action))
-                {
+                $action = self::lowerCamelCase(self::$route['action'] . 'Action');
+
+                if (method_exists($cObj, $action)) {
                     $cObj->$action();
+                    $cObj->getView();
                 } else {
                     echo "Метод <b>$controller</b>::$action не найден";
                 }
-            }else {
+            } else {
                 echo "Контроллер <b>$controller</b> не найден";
             }
-        }else {
+        } else {
             http_response_code(404);
             include '404.html';
         }
@@ -108,7 +114,7 @@ class Router
      * @param string $str строка для преобразования
      * @return string преоборазованная строка
      */
-    protected static function upperCamelCase(string $str) : string
+    protected static function upperCamelCase(string $str): string
     {
         $str = str_replace('-', ' ', $str);
         $str = ucwords($str);
@@ -122,8 +128,26 @@ class Router
      * @param string $str строка для преобразования
      * @return string преоборазованная строка
      */
-    protected static function lowerCamelCase(string $str) : string
+    protected static function lowerCamelCase(string $str): string
     {
         return lcfirst(self::upperCamelCase($str));
+    }
+
+    /**
+     * Обрезает возможные get параметры
+     * @param string $url Входящий url
+     * @return string
+     */
+    protected static function removeQueryString($url)
+    {
+        if ($url)
+        {
+            $params = explode('&', $url, 2);
+            if (false === strpos($params[0], '=')) {
+                return rtrim($params[0], '/');
+            } else {
+                return '';
+            }
+        }
     }
 }
