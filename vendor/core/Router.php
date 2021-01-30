@@ -90,7 +90,7 @@ class Router
 
             if (class_exists($controller)) {
                 $cObj = new $controller(self::$route);
-                
+
                 $action = self::lowerCamelCase(self::$route['action'] . 'Action');
 
                 if (method_exists($cObj, $action)) {
@@ -140,8 +140,7 @@ class Router
      */
     protected static function removeQueryString($url)
     {
-        if ($url)
-        {
+        if ($url) {
             $params = explode('&', $url, 2);
             if (false === strpos($params[0], '=')) {
                 return rtrim($params[0], '/');

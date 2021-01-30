@@ -19,9 +19,14 @@ abstract class Controller
 
     /**
      * Текущий вид
-     * @var string
      */
     public $layout = '';
+
+    /**
+     * Массив пользовательсиких данных
+     * @var array
+     */
+    public array $vars = [];
 
     public function __construct(array $route)
     {
@@ -29,9 +34,21 @@ abstract class Controller
         $this->view = $route['action'];
     }
 
+    /**
+     * Получает объект вида страницы и осуществляет ее рендер
+     */
     public function getView()
     {
         $vObj = new View($this->route, $this->layout, $this->view);
-        $vObj->render();
+        $vObj->render($this->vars);
+    }
+
+    /**
+     * Устанавливает переменные в шаблон рендера
+     * @param array $vars массив пользовательских данных
+     */
+    public function set($vars)
+    {
+        $this->vars = $vars;
     }
 }
