@@ -10,7 +10,8 @@ define('WWW', __DIR__);  //текущая директория
 define('CORE', dirname(__DIR__) . '/vendor/core');  //директория ядра фрэйморвка
 define('ROOT', dirname(__DIR__));  //корневая директория фрэймворка
 define('APP', dirname(__DIR__) . '/app');  //директория app
-define('LAYOUT', 'default');
+define('LIBS', dirname(__DIR__) . '/vendor/libs');
+define('LAYOUT', 'default'); //шаблон по умолчанию
 
 require '../vendor/core/Router.php';
 require '../vendor/libs/functions.php';
@@ -26,8 +27,7 @@ spl_autoload_register(function ($class) {
 });
 
 //пользовательские правила
-Router::add('^page/(?P<action>[a-z-]+)/(?P<alias>[a-z-]+)$', ['controller' => 'Page']);
-Router::add('^page/(?P<alias>[a-z-]+)$', ['controller' => 'Page', 'action' => 'view']);
+
 //маршруты по умолчанию
 Router::add('^$', ['controller' => 'Main', 'action' => 'index']);
 Router::add('^(?P<controller>[a-z-]+)/?(?P<action>[a-z-]+)?$');
